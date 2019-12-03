@@ -23,6 +23,7 @@ Future request(url, {formData}) async {
   } catch (e) {
     return print('ERROR:======>${e}');
   }
+
 }
 
 //获得商城首页信息的方法
@@ -62,3 +63,4 @@ Future getHomePageBeloConten() async {
     return print('ERROR:======>${e}');
   }
 }
+

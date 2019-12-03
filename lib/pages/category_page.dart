@@ -7,6 +7,10 @@ import 'package:provide/provide.dart';
 import '../model/categoryGoodsList.dart';
 import '../provide/child_category.dart';
 import '../provide/category_goods_list.dart';
+//上拉刷新组件
+import 'package:flutter_easyrefresh/easy_refresh.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import '../routers/application.dart';
 
 class CategoryPage extends StatefulWidget {
   _CategoryPageState createState() => _CategoryPageState();
@@ -177,7 +181,8 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
 
     return InkWell(
       onTap: () {
-        Provide.value<ChildCategory>(context).changeChildIndex(index);
+        Provide.value<ChildCategory>(context)
+            .getChildCategory(list[0].bxMallSubDto, list[0].mallCategoryId);
         _getGoodList(item.mallSubId);
       },
       child: Container(
@@ -191,6 +196,7 @@ class _RightCategoryNavState extends State<RightCategoryNav> {
       ),
     );
   }
+// emulator.exe -avd flutter_emulator -dns-server 192.168.0.1
 
   //得到商品列表数据
   void _getGoodList(String categorySubId) {
@@ -220,20 +226,59 @@ class CategoryGoodsList extends StatefulWidget {
 }
 
 class _CategoryGoodsListState extends State<CategoryGoodsList> {
+  //使用easyrefesh要记得初始化
+  GlobalKey<EasyRefreshState> _easyRefreshKey =
+      new GlobalKey<EasyRefreshState>();
+  GlobalKey<RefreshFooterState> _footerKey =
+      new GlobalKey<RefreshFooterState>();
+
+  var scrollController = new ScrollController();
   @override
   Widget build(BuildContext context) {
     return Provide<CategoryGoodsListProvide>(
       builder: (context, child, data) {
+        try {
+          if (Provide.value<ChildCategory>(context).page == 1) {
+            scrollController.jumpTo(0.0);
+          }
+        } catch (e) {
+          print('进入页面第一次初始化：${e}');
+        }
+
         // 修改 Category_page.dart里的商品列表页面，不再约束高了，而是使用Expanded Widget包裹外层，
         if (data.goodsList.length > 0) {
           return Expanded(
             child: Container(
               width: ScreenUtil().setWidth(570),
               // height: ScreenUtil().setHeight(1000),
-              child: ListView.builder(
-                itemCount: data.goodsList.length,
-                itemBuilder: (context, index) {
-                  return _ListWidget(data.goodsList, index);
+              //上拉刷新操作  其实就是再包一层
+              child: EasyRefresh(
+                refreshFooter: ClassicsFooter(
+                    key: _footerKey,
+                    bgColor: Colors.white,
+                    textColor: Colors.pink,
+                    moreInfoColor: Colors.pink,
+                    showMore: true,
+                    noMoreText:
+                        Provide.value<ChildCategory>(context).noMoreText,
+                    moreInfo: '加载中',
+                    loadReadyText: '上拉加载'),
+                child: ListView.builder(
+                  controller: scrollController,
+                  itemCount: data.goodsList.length,
+                  itemBuilder: (context, index) {
+                    return _ListWidget(data.goodsList, index);
+                  },
+                ),
+                loadMore: () async {
+                  Fluttertoast.showToast(
+                      msg: "已经到底了",
+                      toastLength: Toast.LENGTH_SHORT,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIos: 1,
+                      backgroundColor: Colors.pink,
+                      textColor: Colors.white,
+                      fontSize: 16.0);
                 },
               ),
             ),
@@ -245,9 +290,36 @@ class _CategoryGoodsListState extends State<CategoryGoodsList> {
     );
   }
 
+//上拉加载更多的方法
+  void _getMoreList() {
+    //全局调用这个添加的方法
+    Provide.value<ChildCategory>(context).addPage();
+    var data = {
+      'categoryId': Provide.value<ChildCategory>(context).categoryId,
+      'categorySubId': Provide.value<ChildCategory>(context).subId,
+      'page': Provide.value<ChildCategory>(context).page
+    };
+
+    request('getMallGoods', formData: data).then((val) {
+      var data = json.decode(val.toString());
+      //格式化回来的数据
+      CategoryGoodsListModel goodsList = CategoryGoodsListModel.fromJson(data);
+
+      if (goodsList.data == null) {
+        Provide.value<ChildCategory>(context).changeNoMore('没有更多了');
+      } else {
+        //触发全局调用
+        Provide.value<CategoryGoodsListProvide>(context)
+            .addGoodsList(goodsList.data);
+      }
+    });
+  }
+
   Widget _ListWidget(List newList, int index) {
     return InkWell(
-        onTap: () {},
+        onTap: () {
+           Application.router.navigateTo(context, "/detail?id=${newList[index].goodsId}");
+        },
         child: Container(
           padding: EdgeInsets.only(top: 5.0, bottom: 5.0),
           decoration: BoxDecoration(

@@ -1,3 +1,4 @@
+import 'package:demo6/routers/application.dart';
 import 'package:flutter/material.dart';
 import '../service/service_method.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
@@ -5,6 +6,7 @@ import 'dart:convert';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
+import '../routers/application.dart';
 
 class HomePage extends StatefulWidget  {
   @override
@@ -166,7 +168,7 @@ class _HomePageState extends State<HomePage>  with AutomaticKeepAliveClientMixin
       List<Widget> listWidget = hotGoodsList.map((val) {
         return InkWell(
             onTap: () {
-              // Application.router.navigateTo(context, "/detail?id=${val['goodsId']}");
+              Application.router.navigateTo(context, "/detail?id=${val['goodsId']}");
             },
             child: Container(
               width: ScreenUtil().setWidth(372),
@@ -272,7 +274,7 @@ class SwiperDiy extends StatelessWidget {
         itemBuilder: (BuildContext context, int index) {
           return InkWell(
             onTap: () {
-              //  Application.router.navigateTo(context,"/detail?id=${swiperDataList[index]['goodsId']}");
+               Application.router.navigateTo(context,"/detail?id=${swiperDataList[index]['goodsId']}");
             },
             child: Image.network("${swiperDataList[index]['image']}",
                 fit: BoxFit.fill),
@@ -374,6 +376,9 @@ class Recommend extends StatelessWidget {
   Widget _item(index, context) {
     return InkWell(
       onTap: () {
+        Application.router.navigateTo(context,"/detail?id=${recommendList[index]['goodsId']}");
+
+
         print('你点击的商品详情');
       },
       child: Container(
@@ -453,7 +458,7 @@ class FloorContent extends StatelessWidget {
       width: ScreenUtil().setWidth(375),
       child: InkWell(
         onTap: () {
-          // Application.router.navigateTo(context, "/detail?id=${goods['goodsId']}");
+          Application.router.navigateTo(context, "/detail?id=${goods['goodsId']}");
           print('点击${goods['goodsId']}');
         },
         child: Image.network(goods['image']),
