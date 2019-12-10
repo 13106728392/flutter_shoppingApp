@@ -9,7 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class DetailsWeb  extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-     ScreenUtil.instance = ScreenUtil(width: 750, height: 1334);
+  
     var goodsDetail = Provide.value<DetailsInfoProvide>(context).goodsInfo.data.goodInfo.goodsDetail;
     print(goodsDetail);
     return Provide<DetailsInfoProvide>(

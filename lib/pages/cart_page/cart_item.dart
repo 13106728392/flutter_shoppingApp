@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../model/cartInfo.dart';
+import './cart_count.dart';
+import 'package:provide/provide.dart';
+import '../../provide/cart.dart';
+import '../../routers/application.dart';
 
 class CartItem extends StatelessWidget {
   final CartInfoMode item;
   CartItem(this.item);
   @override
   Widget build(BuildContext context) {
-    print(item);
-    ScreenUtil.instance = ScreenUtil(width: 750, height: 1334);
+ 
     return Container(
       margin: EdgeInsets.fromLTRB(5.0, 2.0, 5.0, 2.0),
       padding: EdgeInsets.fromLTRB(5.0, 10.0, 5.0, 10.0),
@@ -17,34 +20,42 @@ class CartItem extends StatelessWidget {
           border: Border(bottom: BorderSide(width: 1, color: Colors.black12))),
       child: Row(
         children: <Widget>[
-          _cartCheckBt(item),
-          _cartImage(item),
+          _cartCheckBt(context, item),
+          _cartImage(context,item),
           _cartGoodsName(item),
-          _cartPrice(item)
+          _cartPrice(context, item)
         ],
       ),
     );
   }
 
   //多选按钮
-  Widget _cartCheckBt(item) {
+  Widget _cartCheckBt(context, item) {
     return Container(
       child: Checkbox(
-        value: true,
+        value: item.isCheck,
         activeColor: Colors.pink,
-        onChanged: (bool val) {},
+        onChanged: (bool val) {
+          item.isCheck = val;
+          Provide.value<CartProvide>(context).changeCheckState(item);
+        },
       ),
     );
   }
 
   //商品图片
-  Widget _cartImage(item) {
-    return Container(
-      width: ScreenUtil().setWidth(150),
-      padding: EdgeInsets.all(3.0),
-      decoration:
-          BoxDecoration(border: Border.all(width: 1, color: Colors.black12)),
-      child: Image.network(item.images),
+  Widget _cartImage(context,item) {
+    return InkWell(
+      onTap: () {
+         Application.router.navigateTo(context,"/detail?id=${item.goodsId}");
+      },
+      child: Container(
+        width: ScreenUtil().setWidth(150),
+        padding: EdgeInsets.all(3.0),
+        decoration:
+            BoxDecoration(border: Border.all(width: 1, color: Colors.black12)),
+        child: Image.network(item.images),
+      ),
     );
   }
 
@@ -55,13 +66,13 @@ class CartItem extends StatelessWidget {
       padding: EdgeInsets.all(10),
       alignment: Alignment.topLeft,
       child: Column(
-        children: <Widget>[Text(item.goodsName)],
+        children: <Widget>[Text(item.goodsName), CartCount(item)],
       ),
     );
   }
 
 //商品价格
-  Widget _cartPrice(item) {
+  Widget _cartPrice(context, item) {
     return Container(
       width: ScreenUtil().setWidth(150),
       alignment: Alignment.centerRight,
@@ -70,7 +81,10 @@ class CartItem extends StatelessWidget {
           Text('￥${item.price}'),
           Container(
             child: InkWell(
-              onTap: () {},
+              onTap: () {
+                Provide.value<CartProvide>(context)
+                    .deleteOneGoods(item.goodsId);
+              },
               child: Icon(
                 Icons.delete_forever,
                 color: Colors.black26,

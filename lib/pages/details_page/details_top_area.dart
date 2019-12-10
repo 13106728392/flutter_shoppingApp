@@ -7,7 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class DetailsTopArea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    ScreenUtil.instance = ScreenUtil(width: 750, height: 1334);
+   
     return Provide<DetailsInfoProvide>(
       builder: (context, child, val) {
         var goodsInfo =

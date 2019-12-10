@@ -19,8 +19,6 @@ class CategoryPage extends StatefulWidget {
 class _CategoryPageState extends State<CategoryPage> {
   @override
   Widget build(BuildContext context) {
-    ScreenUtil.instance = ScreenUtil(width: 750, height: 1334)
-      ..init(context); //使用ScreenUtil初始化，关键
     return Scaffold(
       appBar: AppBar(
         title: Text('商品分类'),

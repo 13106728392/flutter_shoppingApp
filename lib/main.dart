@@ -9,23 +9,25 @@ import './routers/routes.dart';
 import './routers/application.dart';
 import './provide/details_info.dart';
 import './provide/cart.dart';
+import './provide/currentIndex.dart';
 
 void main() {
-  var childCategory = ChildCategory();
+  var childCategory= ChildCategory();
   var categoryGoodsListProvide= CategoryGoodsListProvide();
-  var providers = Providers();
-  var counter = Counter();
   var detailsInfoProvide= DetailsInfoProvide();
-  //购物车
-  var cartProvide = CartProvide();
+  var cartProvide  =CartProvide();
+  var currentIndexProvide  =CurrentIndexProvide();
+  var counter =Counter();
+  var providers  =Providers();
   
 
   providers
-    ..provide(Provider<Counter>.value(counter))
-     ..provide(Provider<CategoryGoodsListProvide>.value(categoryGoodsListProvide))
-    ..provide(Provider<ChildCategory>.value(childCategory))
-    ..provide(Provider<CartProvide>.value(cartProvide))  //购物车
-    ..provide(Provider<DetailsInfoProvide>.value(detailsInfoProvide));
+     ..provide(Provider<ChildCategory>.value(childCategory))
+    ..provide(Provider<CategoryGoodsListProvide>.value(categoryGoodsListProvide))
+    ..provide(Provider<DetailsInfoProvide>.value(detailsInfoProvide))
+    ..provide(Provider<CartProvide>.value(cartProvide))
+    ..provide(Provider<CurrentIndexProvide>.value(currentIndexProvide))
+    ..provide(Provider<Counter>.value(counter));
 
     runApp(ProviderNode(child: MyApp(), providers: providers));
 }
